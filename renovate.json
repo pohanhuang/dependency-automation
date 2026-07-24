@@ -28,10 +28,18 @@
   "vulnerabilityAlerts": {
     "enabled": true,
     "labels": ["needs-review"],
+    "minimumReleaseAge": "3 days",
     "automerge": false,
     "force": {
       "packageRules": [
-        { 
+        {
+          "description": "Auto-merge patch security updates only",
+          "matchUpdateTypes": ["patch"],
+          "automerge": true,
+          "automergeType": "pr",
+          "automergeStrategy": "squash"
+        },
+        {
           "description": "Only allow patch updates for github.com/harvester/harvester on release branches",
           "matchPackageNames": [
             "github.com/harvester/harvester"
