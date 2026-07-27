@@ -100,14 +100,18 @@
       "matchPackageNames": ["github.com/rancher/lasso"]
     },
     {
-      "description": "Disable longhorn packages",
+      "description": "Disable longhorn packages on release branches",
       "enabled": false,
       "matchManagers": ["gomod"],
+      "matchBaseBranches": ["/^v\\d+(\\.\\d+)+/"],
       "matchPackagePatterns": ["^github\\.com/longhorn/"]
     },
     {
-      "description": "Disable kubevirt updates",
-      "enabled": false
+      "description": "Disable kubevirt updates on release branches",
+      "enabled": false,
+      "matchManagers": ["gomod"],
+      "matchBaseBranches": ["/^v\\d+(\\.\\d+)+/"],
+      "matchPackagePatterns": ["^kubevirt\\.io/"]
     },
     {
       "description": "Group golang toolchain - go.mod",
