@@ -11,7 +11,8 @@ Current defaults include:
 - **Security-only updates**: Only dependencies with known vulnerabilities will be updated (need manual review)
 - All non-security updates (patch, minor, major) are disabled by default
 - OSV vulnerability database integration enabled via `osvVulnerabilityAlerts`
-- Disable some risky or manually managed updates such as `Longhorn`, `kubevirt`, Helm, and Go major bumps
+- Disable some risky or manually managed updates such as Helm and Go major bumps
+- Keep `Longhorn` and `kubevirt` updates disabled on release branches only
 - Group related dependencies into a single PR, such as:
   - `golang toolchain`
   - `SUSE BCI base images`
@@ -27,7 +28,7 @@ Current defaults include:
 ## Branch Policy
 
 - `main` and `master`: normal update flow
-- Release branches matching `v*`: not scanned by default; if a repository opts in via `baseBranchPatterns`, only patch and security updates are enabled
+- Release branches matching `v*`: not scanned by default; if a repository opts in via `baseBranchPatterns`, only patch and security updates are enabled, and `Longhorn` / `kubevirt` remain blocked
 
 ### Forcing Patch-Only Updates on Release Branches
 
@@ -72,7 +73,7 @@ Add repo-specific overrides locally if needed.
 | [harvester/terraform-provider-harvester](https://github.com/harvester/terraform-provider-harvester/pulls) | ✅ | ✅ | ✅ | ✅ |
 | [harvester/storage-validator](https://github.com/harvester/storage-validator/pulls) | ✅ | ✅ | ✅ | ✅ |
 | [harvester/forklift-packaging](https://github.com/harvester/forklift-packaging/pulls) | ✅ | ✅ | ✅ | ✅ |
-| [harvester/upgrade-responder](https://github.com/harvester/upgrade-responder/pulls) | 🚧 | 🚧 | 🚧 | 🚧 |
+| [harvester/upgrade-responder](https://github.com/harvester/upgrade-responder/pulls) | ✅ | ✅ | ✅ | ✅ |
 | [harvester/harvester-csi-driver](https://github.com/harvester/harvester-csi-driver/pulls) | ✅ | ❌ | ❌ | ❌ |
 | [harvester/go-common](https://github.com/harvester/go-common/pulls) | ✅ | ❌ | ❌ | ❌ |
 | [harvester/cloud-provider-harvester](https://github.com/harvester/cloud-provider-harvester/pulls) | ✅ | ❌ | ❌ | ❌ |

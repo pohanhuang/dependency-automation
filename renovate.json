@@ -28,10 +28,18 @@
   "vulnerabilityAlerts": {
     "enabled": true,
     "labels": ["needs-review"],
+    "minimumReleaseAge": "3 days",
     "automerge": false,
     "force": {
       "packageRules": [
-        { 
+        {
+          "description": "Auto-merge patch security updates only",
+          "matchUpdateTypes": ["patch"],
+          "automerge": true,
+          "automergeType": "pr",
+          "automergeStrategy": "squash"
+        },
+        {
           "description": "Only allow patch updates for github.com/harvester/harvester on release branches",
           "matchPackageNames": [
             "github.com/harvester/harvester"
@@ -92,14 +100,18 @@
       "matchPackageNames": ["github.com/rancher/lasso"]
     },
     {
-      "description": "Disable longhorn packages",
+      "description": "Disable longhorn packages on release branches",
       "enabled": false,
       "matchManagers": ["gomod"],
+      "matchBaseBranches": ["/^v\\d+(\\.\\d+)+/"],
       "matchPackagePatterns": ["^github\\.com/longhorn/"]
     },
     {
-      "description": "Disable kubevirt updates",
-      "enabled": false
+      "description": "Disable kubevirt updates on release branches",
+      "enabled": false,
+      "matchManagers": ["gomod"],
+      "matchBaseBranches": ["/^v\\d+(\\.\\d+)+/"],
+      "matchPackagePatterns": ["^kubevirt\\.io/"]
     },
     {
       "description": "Group golang toolchain - go.mod",
