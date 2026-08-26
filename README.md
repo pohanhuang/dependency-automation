@@ -8,15 +8,35 @@ This repository centralizes Renovate settings so other repositories can reuse th
 
 Current defaults include:
 
-- **Security-only updates**: Only dependencies with known vulnerabilities will be updated (need manual review)
-- All non-security updates (patch, minor, major) are disabled by default
+- **Security-only updates**: Only dependencies with known vulnerabilities will be updated
+- All non-security updates (patch, minor, major) are disabled by default via the `security:only-security-updates` preset
 - OSV vulnerability database integration enabled via `osvVulnerabilityAlerts`
-- Disable some risky or manually managed updates such as Helm and Go major bumps
+- Disable some risky or manually managed updates such as Helm, Go major bumps, and `github.com/rancher/lasso`
 - Keep `Longhorn` and `kubevirt` updates disabled on release branches only
-- Group related dependencies into a single PR, such as:
-  - `golang toolchain`
-  - `SUSE BCI base images`
-  - `k8s + rancher dependencies`
+- Group related dependencies into a single PR:
+  - `golang toolchain` (the `go` directive in `go.mod` plus the `golang` / `registry.suse.com/bci/golang` Dockerfile stages)
+  - `k8s + rancher dependencies` (`k8s.io/`, `github.com/rancher/`, `github.com/k3s-io/`), with a PR note to check Longhorn compatibility
+  - A `SUSE BCI base images` group is defined but **currently disabled** (`enabled: false`), so BCI base images are not bumped
+
+## Merge Policy
+
+- All vulnerability PRs are labelled `needs-review`, wait for a `minimumReleaseAge` of 3 days, and get `harvester/dev` as reviewer
+- **Patch** security updates are then **auto-merged** (squash) via `vulnerabilityAlerts.force`
+- **Minor** and **major** security updates require manual review
+
+## Other Inherited Defaults
+
+Consuming repositories also inherit:
+
+- `dependencyDashboard: false` — no dependency dashboard issue is created
+- `recreateWhen: "always"` — closing a Renovate PR does not suppress it; the PR is recreated
+- `prHourlyLimit: 0` / `prConcurrentLimit: 0` — no cap on open or hourly PRs
+- `ignorePaths`: `deploy/**` and `**/charts/**`
+- `lockFileMaintenance: enabled` — this is the one PR source that is not vulnerability-driven
+- Labels: `dependencies` (gomod / dockerfile / pip), `ci` (github-actions), `needs-review` (vulnerability PRs)
+- Semantic commits (`chore(deps)`, `chore(ci)`), `:gitSignOff`, merge-confidence age badges
+- `postUpdateOptions`: `gomodTidy`, `gomodVendor`
+- Schedule `at any time`, timezone `Asia/Taipei`
 
 ## Supported Managers
 
@@ -27,14 +47,21 @@ Current defaults include:
 
 ## Branch Policy
 
-- `main` and `master`: normal update flow
-- Release branches matching `v*`: not scanned by default; if a repository opts in via `baseBranchPatterns`, only patch and security updates are enabled, and `Longhorn` / `kubevirt` remain blocked
+The shared config sets `baseBranchPatterns` to `master`, `main`, `v1.7`, `v1.8`, `v1.9`. Every consuming repository scans all five; there is nothing to opt into. Branches that do not exist in a repository are simply skipped — that is what the ❌ cells in the support matrix below mean.
+
+- `main` / `master`: security-only updates, at any update type (subject to the global exclusions above — Helm, Go majors, `rancher/lasso`)
+- Release branches matching `/^v\d+(\.\d+)+/`, additionally:
+  - Major and minor updates are disabled via `packageRules`
+  - `Longhorn` (`github.com/longhorn/`) and `kubevirt` (`kubevirt.io/`) Go modules are disabled
+  - Note that `packageRules` do not constrain vulnerability-driven updates — see below
 
 ### Forcing Patch-Only Updates on Release Branches
 
 **Problem**: `osvVulnerabilityAlerts` ignores `major.enabled: false`, and standard `packageRules` cannot block major updates for OSV vulnerability fixes ([renovate#42760](https://github.com/renovatebot/renovate/issues/42760)).
 
-**Solution**: Use `vulnerabilityAlerts.force.packageRules` with `allowedVersions` to restrict updates to the current minor version (e.g., `~1.7.0` on the `v1.7` branch).
+**Solution**: Use `vulnerabilityAlerts.force.packageRules` with `allowedVersions` to restrict updates to the current minor version. `allowedVersions` is templated as `~{{major}}.{{minor}}.0`, which resolves against the **currently installed version**, so a repo on `v1.7` pinned to `harvester` 1.7.x gets `~1.7.0`.
+
+**Limitation**: this clamp is applied to `github.com/harvester/harvester` only. A major security bump of any other dependency is still possible on a release branch. Extend `vulnerabilityAlerts.force.packageRules` if another package needs the same treatment.
 
 ## Usage
 
@@ -86,3 +113,9 @@ Add repo-specific overrides locally if needed.
 ## Main Config
 
 The shared Renovate configuration lives in [renovate.json](./renovate.json).
+
+Validate changes before merging — consumers of a preset never receive Renovate's automatic config-migration PRs, so problems here surface only as warnings in their logs:
+
+```sh
+npx --package renovate -- renovate-config-validator --strict renovate.json
+```
