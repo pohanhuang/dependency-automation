@@ -10,7 +10,6 @@
     "v1.9"
   ],
   "dependencyDashboard": false,
-  "recreateWhen": "always",
   "osvVulnerabilityAlerts": true,
   "enabledManagers": [
     "gomod",
@@ -54,12 +53,6 @@
     "deploy/**",
     "**/charts/**"
   ],
-  "dockerfile": {
-    "managerFilePatterns": [
-      "(^|/)Dockerfile$",
-      "(^|/)Dockerfile\\.[^/]*$"
-    ]
-  },
   "lockFileMaintenance": {
     "enabled": true
   },
@@ -104,14 +97,14 @@
       "enabled": false,
       "matchManagers": ["gomod"],
       "matchBaseBranches": ["/^v\\d+(\\.\\d+)+/"],
-      "matchPackagePatterns": ["^github\\.com/longhorn/"]
+      "matchPackageNames": ["/^github\\.com/longhorn//"]
     },
     {
       "description": "Disable kubevirt updates on release branches",
       "enabled": false,
       "matchManagers": ["gomod"],
       "matchBaseBranches": ["/^v\\d+(\\.\\d+)+/"],
-      "matchPackagePatterns": ["^kubevirt\\.io/"]
+      "matchPackageNames": ["/^kubevirt\\.io//"]
     },
     {
       "description": "Group golang toolchain - go.mod",
@@ -120,7 +113,7 @@
       "matchPackageNames": ["go"],
       "matchDepTypes": ["golang"],
       "groupName": "golang toolchain",
-      "semanticCommitType": "deps",
+      "semanticCommitType": "chore",
       "semanticCommitScope": "go",
       "automerge": false,
       "rangeStrategy": "bump"
@@ -132,17 +125,10 @@
       "matchPackageNames": ["golang", "registry.suse.com/bci/golang"],
       "matchDepTypes": ["stage", "final"],
       "groupName": "golang toolchain",
-      "semanticCommitType": "deps",
+      "semanticCommitType": "chore",
       "semanticCommitScope": "go",
       "automerge": false,
       "rangeStrategy": "bump"
-    },
-    {
-      "description": "Allow vulnerability updates for indirect Go modules",
-      "matchManagers": ["gomod"],
-      "matchDepTypes": ["indirect"],
-      "matchCategories": ["security"],
-      "enabled": true
     },
     {
       "description": "Group all BCI base images together",
@@ -163,10 +149,10 @@
     {
       "description": "Group k8s and rancher packages",
       "matchManagers": ["gomod"],
-      "matchPackagePatterns": [
-        "k8s\\.io/",
-        "^github\\.com/rancher/",
-        "^github\\.com/k3s-io/"
+      "matchPackageNames": [
+        "/k8s\\.io//",
+        "/^github\\.com/rancher//",
+        "/^github\\.com/k3s-io//"
       ],
       "automerge": false,
       "groupName": "k8s + rancher dependencies",
@@ -174,6 +160,7 @@
     },
     {
       "description": "Label PRs with target branch name",
+      "matchPackageNames": ["*"],
       "addLabels": ["renovate/{{baseBranch}}"]
     }
   ],
