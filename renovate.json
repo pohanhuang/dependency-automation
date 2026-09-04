@@ -10,7 +10,6 @@
     "v1.9"
   ],
   "dependencyDashboard": false,
-  "osvVulnerabilityAlerts": true,
   "enabledManagers": [
     "gomod",
     "dockerfile",
@@ -18,10 +17,9 @@
     "pip_requirements"
   ],
   "extends": [
-    "config:recommended",
+    "github>rancher/renovate-config",
     "security:only-security-updates",
     ":semanticCommitTypeAll(chore)",
-    "mergeConfidence:age-confidence-badges",
     ":gitSignOff"
   ],
   "vulnerabilityAlerts": {
@@ -58,16 +56,10 @@
   },
   "packageRules": [
     {
-      "description": "Use dependencies label for real dependency updates",
-      "matchManagers": ["gomod", "dockerfile", "pip_requirements"],
-      "addLabels": ["dependencies"]
-    },
-    {
-      "description": "Use ci scope for GitHub Actions updates",
-      "matchManagers": ["github-actions"],
-      "addLabels": ["ci"],
-      "semanticCommitType": "chore",
-      "semanticCommitScope": "ci"
+      "description": "Re-enable rancher/* updates (overrides rancher preset disable)",
+      "matchManagers": ["gomod"],
+      "matchPackageNames": ["github.com/rancher/**"],
+      "enabled": true
     },
     {
       "description": "Release branches: only security",
@@ -107,44 +99,15 @@
       "matchPackageNames": ["/^kubevirt\\.io//"]
     },
     {
-      "description": "Group golang toolchain - go.mod",
-      "matchManagers": ["gomod"],
-      "matchDepNames": ["go"],
-      "matchPackageNames": ["go"],
-      "matchDepTypes": ["golang"],
-      "groupName": "golang toolchain",
-      "semanticCommitType": "chore",
-      "semanticCommitScope": "go",
-      "automerge": false,
-      "rangeStrategy": "bump"
-    },
-    {
-      "description": "Group golang toolchain - Dockerfile",
-      "matchManagers": ["dockerfile"],
-      "matchDatasources": ["docker"],
-      "matchPackageNames": ["golang", "registry.suse.com/bci/golang"],
-      "matchDepTypes": ["stage", "final"],
-      "groupName": "golang toolchain",
-      "semanticCommitType": "chore",
-      "semanticCommitScope": "go",
-      "automerge": false,
-      "rangeStrategy": "bump"
-    },
-    {
-      "description": "Group all BCI base images together",
+      "description": "Disable BCI base image updates (golang BCI tracked via Go toolchain group)",
       "enabled": false,
-      "matchManagers": ["dockerfile"],
       "matchDatasources": ["docker"],
       "matchPackageNames": [
-        "registry.suse.com/bci/**",
-        "registry.opensuse.org/**",
-        "!registry.suse.com/bci/golang"
-      ],
-      "groupName": "SUSE BCI base images",
-      "semanticCommitType": "chore",
-      "semanticCommitScope": "deps",
-      "automerge": false,
-      "rangeStrategy": "bump"
+        "/^registry\\.suse\\.com\\/bci\\//",
+        "/^registry\\.opensuse\\.org\\//",
+        "!registry.suse.com/bci/golang",
+        "!registry.opensuse.org/opensuse/bci/golang"
+      ]
     },
     {
       "description": "Group k8s and rancher packages",
