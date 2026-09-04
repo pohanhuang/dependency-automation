@@ -1,7 +1,11 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "prHourlyLimit": 0,
-  "prConcurrentLimit": 0,
+  "extends": [
+    "github>rancher/renovate-config",
+    "security:only-security-updates",
+    ":semanticCommitTypeAll(chore)",
+    ":gitSignOff"
+  ],
   "baseBranchPatterns": [
     "master",
     "main",
@@ -9,19 +13,29 @@
     "v1.8",
     "v1.9"
   ],
-  "dependencyDashboard": false,
   "enabledManagers": [
     "gomod",
     "dockerfile",
     "github-actions",
     "pip_requirements"
   ],
-  "extends": [
-    "github>rancher/renovate-config",
-    "security:only-security-updates",
-    ":semanticCommitTypeAll(chore)",
-    ":gitSignOff"
+  "ignorePaths": [
+    "deploy/**",
+    "**/charts/**"
   ],
+  "schedule": ["at any time"],
+  "timezone": "Asia/Taipei",
+  "dependencyDashboard": false,
+  "prHourlyLimit": 0,
+  "prConcurrentLimit": 0,
+  "semanticCommits": "enabled",
+  "semanticCommitType": "chore",
+  "semanticCommitScope": "deps",
+  "reviewers": ["harvester/dev"],
+  "lockFileMaintenance": {
+    "enabled": true
+  },
+  "postUpdateOptions": ["gomodTidy", "gomodVendor"],
   "vulnerabilityAlerts": {
     "enabled": true,
     "labels": ["needs-review"],
@@ -38,21 +52,11 @@
         },
         {
           "description": "Only allow patch updates for github.com/harvester/harvester on release branches",
-          "matchPackageNames": [
-            "github.com/harvester/harvester"
-          ],
+          "matchPackageNames": ["github.com/harvester/harvester"],
           "allowedVersions": "~{{major}}.{{minor}}.0"
         }
       ]
     }
-  },
-  "reviewers": ["harvester/dev"],
-  "ignorePaths": [
-    "deploy/**",
-    "**/charts/**"
-  ],
-  "lockFileMaintenance": {
-    "enabled": true
   },
   "packageRules": [
     {
@@ -126,11 +130,5 @@
       "matchPackageNames": ["*"],
       "addLabels": ["renovate/{{baseBranch}}"]
     }
-  ],
-  "postUpdateOptions": ["gomodTidy", "gomodVendor"],
-  "schedule": ["at any time"],
-  "semanticCommitScope": "deps",
-  "semanticCommitType": "chore",
-  "semanticCommits": "enabled",
-  "timezone": "Asia/Taipei"
+  ]
 }
