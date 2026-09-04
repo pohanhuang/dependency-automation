@@ -60,6 +60,13 @@
   },
   "packageRules": [
     {
+      "description": "Use ci scope for GitHub Actions updates",
+      "matchManagers": ["github-actions"],
+      "addLabels": ["ci"],
+      "semanticCommitType": "chore",
+      "semanticCommitScope": "ci"
+    },    
+    {
       "description": "Re-enable rancher/* updates (overrides rancher preset disable)",
       "matchManagers": ["gomod"],
       "matchPackageNames": ["github.com/rancher/**"],
