@@ -65,12 +65,6 @@
       "addLabels": ["ci"],
       "semanticCommitType": "chore",
       "semanticCommitScope": "ci"
-    },    
-    {
-      "description": "Re-enable rancher/* updates (overrides rancher preset disable)",
-      "matchManagers": ["gomod"],
-      "matchPackageNames": ["github.com/rancher/**"],
-      "enabled": true
     },
     {
       "description": "Release branches: only security",
@@ -119,18 +113,6 @@
         "!registry.suse.com/bci/golang",
         "!registry.opensuse.org/opensuse/bci/golang"
       ]
-    },
-    {
-      "description": "Group k8s and rancher packages",
-      "matchManagers": ["gomod"],
-      "matchPackageNames": [
-        "/k8s\\.io//",
-        "/^github\\.com/rancher//",
-        "/^github\\.com/k3s-io//"
-      ],
-      "automerge": false,
-      "groupName": "k8s + rancher dependencies",
-      "prBodyNotes": ["⚠️ **Check longhorn compatibility before merging.**"]
     },
     {
       "description": "Label PRs with target branch name",
