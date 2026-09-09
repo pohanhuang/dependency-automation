@@ -1,9 +1,11 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "github>rancher/renovate-config",
+    "config:recommended",
     "security:only-security-updates",
     ":semanticCommitTypeAll(chore)",
+    "mergeConfidence:age-confidence-badges",
+    "security:gomodIndirectSecurityUpdates",
     ":gitSignOff"
   ],
   "baseBranchPatterns": [
@@ -26,6 +28,7 @@
   "schedule": ["at any time"],
   "timezone": "Asia/Taipei",
   "dependencyDashboard": false,
+  "osvVulnerabilityAlerts": true,
   "prHourlyLimit": 0,
   "prConcurrentLimit": 0,
   "semanticCommits": "enabled",
@@ -66,6 +69,36 @@
       "semanticCommitType": "chore",
       "semanticCommitScope": "ci"
     },
+    {
+      "description": "Group golang toolchain - go.mod",
+      "matchManagers": ["gomod"],
+      "matchDepNames": ["go"],
+      "matchPackageNames": ["go"],
+      "matchDepTypes": ["golang"],
+      "groupName": "golang toolchain",
+      "semanticCommitType": "chore",
+      "semanticCommitScope": "go",
+      "automerge": false,
+      "rangeStrategy": "bump"
+    },
+    {
+      "description": "Group golang toolchain - Dockerfile",
+      "matchManagers": ["dockerfile"],
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["golang", "registry.suse.com/bci/golang"],
+      "matchDepTypes": ["stage", "final"],
+      "groupName": "golang toolchain",
+      "semanticCommitType": "chore",
+      "semanticCommitScope": "go",
+      "automerge": false,
+      "rangeStrategy": "bump"
+    },
+    {
+      "description": "Group golang.org/x/ packages together as they release in sync and go get forces co-updates",
+      "matchManagers": ["gomod"],
+      "matchPackageNames": ["golang.org/x/**"],
+      "groupName": "golang.org/x dependencies"
+    },    
     {
       "description": "Release branches: only security",
       "matchBaseBranches": ["/^v\\d+(\\.\\d+)+/"],
@@ -112,6 +145,15 @@
         "/^registry\\.opensuse\\.org\\//",
         "!registry.suse.com/bci/golang",
         "!registry.opensuse.org/opensuse/bci/golang"
+      ]
+    },
+    {
+      "description": "Disable Rancher packages updates",
+      "enabled": false,
+      "matchManagers": ["gomod"],
+      "matchPackageNames": [
+        "/^github\\.com/rancher//",
+        "/^github\\.com/k3s-io//"
       ]
     },
     {
